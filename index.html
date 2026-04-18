@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#d85a30"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="FLAGIT"/>
+<title>FLAGIT — HSE Observation Platform</title>
+<link rel="manifest" id="manifest-placeholder"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f6fa;color:#1a1a2e;min-height:100vh}
+input,select,textarea,button{font-family:inherit}
+:root{--brand:#d85a30;--brand-dk:#993c1d;--brand-lt:#faece7;--blue:#185fa5;--blue-lt:#e6f1fb;--green:#1a6b2a;--green-lt:#e6f3e8;--red:#8a1a1a;--red-lt:#fdeaea;--amber:#7a5500;--amber-lt:#fff8e1;--orange:#8a3000;--orange-lt:#fff0e6;--purple:#4a1a8a;--purple-lt:#f0e6ff;--border:#e2e4ea;--surface:#fff;--surface2:#f5f6fa;--text:#1a1a2e;--text2:#6b7280;--radius:10px}
+.card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:16px}
+.btn{padding:11px 18px;border-radius:8px;border:none;font-size:14px;font-weight:500;cursor:pointer}
+.btn-brand{background:var(--brand);color:#fff}.btn-brand:disabled{opacity:.6}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-green{background:var(--green);color:#fff}
+.badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;white-space:nowrap}
+input[type=text],input[type=email],input[type=password],select,textarea{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--brand)}
+.field-label{font-size:12px;color:var(--text2);display:block;margin-bottom:5px}
+.screen{display:none;min-height:100vh}.screen.active{display:block}
+#app-shell{display:none;flex-direction:column;min-height:100vh}#app-shell.active{display:flex}
+.top-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.content{flex:1;padding:16px;max-width:680px;margin:0 auto;width:100%;padding-bottom:80px}
+.bottom-nav{background:var(--surface);border-top:1px solid var(--border);display:flex;position:fixed;bottom:0;left:0;right:0;z-index:100}
+.nav-btn{flex:1;padding:10px 4px;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--text2)}
+.nav-btn.active{color:var(--brand)}.nav-btn svg{width:20px;height:20px}
+.avatar{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:500;flex-shrink:0}
+.obs-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;cursor:pointer;border-left-width:3px}
+.metric{background:var(--surface2);border-radius:8px;padding:10px 14px}
+.metric .val{font-size:24px;font-weight:500}.metric .lbl{font-size:11px;color:var(--text2);margin-bottom:2px}
+.filter-bar{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
+.filter-bar::-webkit-scrollbar{display:none}
+.filter-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-size:12px;cursor:pointer;white-space:nowrap;color:var(--text2)}
+.filter-btn.active{border-color:var(--brand);background:var(--brand-lt);color:var(--brand)}
+.otp-input{width:44px;height:52px;text-align:center;font-size:22px;font-weight:500;border-radius:8px;border:1px solid var(--border)}
+.otp-input:focus{border-color:var(--brand);outline:none}
+.section-label{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.tag-box{background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:10px}
+.status-btn{font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;margin:3px}
+.status-btn.active{border-color:var(--brand);background:var(--brand-lt);color:var(--brand)}
+.comment-bubble{background:var(--surface2);border-radius:8px;padding:8px 12px;flex:1}
+.fab{position:fixed;bottom:70px;right:16px;width:54px;height:54px;border-radius:50%;background:var(--brand);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(216,90,48,.45);z-index:200}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:flex-end;overflow-y:auto}
+.modal{background:var(--surface);border-radius:16px 16px 0 0;padding:20px 16px 32px;width:100%;max-height:94vh;overflow-y:auto}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 16px}
+.error-box{font-size:13px;color:var(--red);background:var(--red-lt);border-radius:7px;padding:8px 12px;margin-bottom:12px}
+.success-box{font-size:13px;color:var(--green);background:var(--green-lt);border-radius:7px;padding:8px 12px;margin-bottom:12px}
+.ai-btn{font-size:11px;padding:4px 10px;border-radius:5px;border:1px solid var(--brand);background:var(--brand-lt);color:var(--brand);cursor:pointer}
+.ai-btn:disabled{opacity:.5;cursor:not-allowed}
+.divider{border:none;border-top:1px solid var(--border);margin:14px 0}
+.back-btn{background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px;padding:0;margin-bottom:14px}
+.wordmark{font-size:26px;font-weight:700;letter-spacing:-0.5px;color:var(--brand)}
+.wordmark span{color:var(--text)}
+.logo-icon{width:56px;height:56px;border-radius:16px;background:var(--brand);display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.photo-thumb{width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;border:1px solid var(--border)}
+.photo-add{width:100%;aspect-ratio:1;border-radius:6px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:11px;gap:4px;background:var(--surface2)}
+.closeout-box{background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:14px;margin-bottom:12px}
+.closeout-box.pending{background:#fffbeb;border-color:#fcd34d}
+.tab{padding:8px 16px;border-radius:6px;border:1px solid var(--border);background:transparent;font-size:13px;cursor:pointer;color:var(--text2)}
+.tab.active{background:var(--brand-lt);border-color:var(--brand);color:var(--brand)}
+.org-pill{background:var(--brand-lt);color:var(--brand-dk);font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;letter-spacing:.04em}
+@media print{.no-print{display:none!important}.print-only{display:block!important}}
+.print-only{display:none}
+.pw-bar{height:4px;border-radius:2px;flex:1}
+</style>
+</head>
+<body>
+
+<!-- SIGN IN -->
+<div class="screen active" id="screen-signin">
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:var(--surface2)">
+<div style="width:100%;max-width:400px">
+  <div style="text-align:center;margin-bottom:28px">
+    <div class="logo-icon"><svg width="30" height="30" viewBox="0 0 30 30" fill="none"><path d="M6 4h14l-4 7 4 7H6V4z" fill="white"/><rect x="4" y="4" width="3" height="22" rx="1.5" fill="white" opacity=".7"/></svg></div>
+    <div class="wordmark">FLAG<span>IT</span></div>
+    <div style="font-size:12px;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;margin-top:2px">HSE Observation Platform</div>
+  </div>
+  <div class="card">
+    <div id="signin-err" class="error-box" style="display:none"></div>
+    <label class="field-label">Organisation</label>
+    <select id="si-org" style="margin-bottom:12px">
+      <option value="">— Select your organisation —</option>
+      <option value="AlphaConstruction">Alpha Construction LLC</option>
+      <option value="BetaEngineering">Beta Engineering Group</option>
+      <option value="GammaOilGas">Gamma Oil & Gas</option>
+    </select>
+    <label class="field-label">Email address</label>
+    <input type="email" id="si-email" placeholder="your@email.com" style="margin-bottom:12px"/>
+    <label class="field-label">Password</label>
+    <input type="password" id="si-pw" placeholder="Your password" style="margin-bottom:6px"/>
+    <div style="text-align:right;margin-bottom:16px"><span onclick="showScreen('forgot')" style="font-size:12px;color:var(--brand);cursor:pointer">Forgot password?</span></div>
+    <button class="btn btn-brand" style="width:100%" id="signin-btn" onclick="doSignIn()">Sign in to FLAGIT</button>
+    <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--text2)">No account? <span onclick="showScreen('signup')" style="color:var(--brand);cursor:pointer">Create one</span></div>
+    <div style="margin-top:14px;padding:10px;background:var(--surface2);border-radius:7px;font-size:12px;color:var(--text2)">Demo: org <b>AlphaConstruction</b> · <b>demo@flagit.app</b> / <b>FlagIt#1!</b></div>
+</div></div></div>
+
+<!-- SIGN UP -->
+<div class="screen" id="screen-signup">
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:var(--surface2)">
+<div style="width:100%;max-width:400px">
+  <div style="text-align:center;margin-bottom:24px">
+    <div class="wordmark" style="font-size:22px">FLAG<span>IT</span></div>
+    <div style="font-size:15px;font-weight:500;margin-top:6px">Create your account</div>
+  </div>
+  <div class="card">
+    <div id="signup-err" class="error-box" style="display:none"></div>
+    <label class="field-label">Organisation</label>
+    <input type="text" id="su-org" placeholder="Enter your organisation name" style="margin-bottom:12px"/>
+    <label class="field-label">Full name</label>
+    <input type="text" id="su-name" placeholder="e.g. Ahmed Al-Farsi" style="margin-bottom:12px"/>
+    <label class="field-label">Role</label>
+    <select id="su-role" style="margin-bottom:12px">
+      <option>Field Safety Officer</option><option>HSE Manager</option><option>Site Supervisor</option><option>Project Manager</option><option>HSE Inspector</option><option>EHS Coordinator</option>
+    </select>
+    <label class="field-label">Email address</label>
+    <input type="email" id="su-email" placeholder="your@email.com" style="margin-bottom:12px"/>
+    <label class="field-label">Password</label>
+    <input type="password" id="su-pw" placeholder="Min. 8 characters" oninput="updatePwStrength()" style="margin-bottom:8px"/>
+    <div style="display:flex;gap:4px;margin-bottom:4px"><div class="pw-bar" id="pb1" style="background:var(--border)"></div><div class="pw-bar" id="pb2" style="background:var(--border)"></div><div class="pw-bar" id="pb3" style="background:var(--border)"></div><div class="pw-bar" id="pb4" style="background:var(--border)"></div></div>
+    <div id="pw-label" style="font-size:11px;margin-bottom:12px"></div>
+    <label class="field-label">Confirm password</label>
+    <input type="password" id="su-confirm" placeholder="Repeat password" style="margin-bottom:16px"/>
+    <button class="btn btn-brand" style="width:100%" onclick="doSignUp()">Create account</button>
+    <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--text2)">Already registered? <span onclick="showScreen('signin')" style="color:var(--brand);cursor:pointer">Sign in</span></div>
+  </div>
+</div></div></div>
+
+<!-- VERIFY -->
+<div class="screen" id="screen-verify">
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:var(--surface2)">
+<div style="width:100%;max-width:380px">
+  <div style="text-align:center;margin-bottom:24px">
+    <div style="width:52px;height:52px;border-radius:50%;background:var(--brand-lt);display:flex;align-items:center;justify-content:center;margin:0 auto 12px"><svg width="24" height="24" fill="none" stroke="var(--brand)" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+    <div class="wordmark" style="font-size:20px">FLAG<span>IT</span></div>
+    <div style="font-size:14px;font-weight:500;margin-top:6px">Verify your email</div>
+    <div style="font-size:13px;color:var(--text2);margin-top:3px" id="verify-sub">Enter the 6-digit code sent to your email</div>
+  </div>
+  <div class="card">
+    <div id="verify-err" class="error-box" style="display:none"></div>
+    <div id="verify-ok" class="success-box" style="display:none">Code resent successfully.</div>
+    <div id="otp-reveal" style="background:linear-gradient(135deg,#fff7ed,#faece7);border:1.5px dashed var(--brand);border-radius:10px;padding:12px 14px;margin-bottom:16px;text-align:center">
+      <div style="font-size:11px;color:var(--brand-dk);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Your verification code</div>
+      <div style="font-size:32px;font-weight:700;letter-spacing:10px;color:var(--brand)" id="otp-display">——</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:4px">In production this is sent to your email. Enter it below.</div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:20px">
+      <input class="otp-input" id="otp0" maxlength="1" inputmode="numeric" oninput="otpInput(0,this)" onkeydown="otpKey(0,event)"/>
+      <input class="otp-input" id="otp1" maxlength="1" inputmode="numeric" oninput="otpInput(1,this)" onkeydown="otpKey(1,event)"/>
+      <input class="otp-input" id="otp2" maxlength="1" inputmode="numeric" oninput="otpInput(2,this)" onkeydown="otpKey(2,event)"/>
+      <input class="otp-input" id="otp3" maxlength="1" inputmode="numeric" oninput="otpInput(3,this)" onkeydown="otpKey(3,event)"/>
+      <input class="otp-input" id="otp4" maxlength="1" inputmode="numeric" oninput="otpInput(4,this)" onkeydown="otpKey(4,event)"/>
+      <input class="otp-input" id="otp5" maxlength="1" inputmode="numeric" oninput="otpInput(5,this)" onkeydown="otpKey(5,event)"/>
+    </div>
+    <button class="btn btn-brand" style="width:100%" onclick="doVerify()">Verify &amp; enter FLAGIT</button>
+    <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--text2)">Didn't receive it? <span onclick="resendCode()" style="color:var(--brand);cursor:pointer">Generate new code</span></div>
+  </div>
+</div></div></div>
+
+<!-- FORGOT -->
+<div class="screen" id="screen-forgot">
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:var(--surface2)">
+<div style="width:100%;max-width:380px">
+  <div style="text-align:center;margin-bottom:24px">
+    <div class="wordmark" style="font-size:20px">FLAG<span>IT</span></div>
+    <div style="font-size:15px;font-weight:500;margin-top:6px">Reset password</div>
+  </div>
+  <div class="card" id="forgot-form-card">
+    <label class="field-label">Work email</label>
+    <input type="email" id="fp-email" placeholder="you@company.com" style="margin-bottom:16px"/>
+    <button class="btn btn-brand" style="width:100%" onclick="doForgot()">Send reset link</button>
+    <div style="text-align:center;margin-top:14px;font-size:13px"><span onclick="showScreen('signin')" style="color:var(--brand);cursor:pointer">Back to sign in</span></div>
+  </div>
+  <div class="card" id="forgot-sent-card" style="display:none;text-align:center">
+    <div style="width:48px;height:48px;border-radius:50%;background:var(--green-lt);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:20px;color:var(--green)">✓</div>
+    <div style="font-size:14px;margin-bottom:6px">Reset link sent to <b id="fp-sent-email"></b></div>
+    <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="showScreen('signin')">Back to sign in</button>
+  </div>
+</div></div></div>
+
+<!-- APP SHELL -->
+<div id="app-shell">
+  <div class="top-bar no-print">
+    <div style="display:flex;align-items:center;gap:8px">
+      <svg width="20" height="20" viewBox="0 0 30 30" fill="none"><path d="M6 4h14l-4 7 4 7H6V4z" fill="var(--brand)"/><rect x="4" y="4" width="3" height="22" rx="1.5" fill="var(--brand-dk)"/></svg>
+      <span class="wordmark" style="font-size:18px">FLAG<span>IT</span></span>
+      <span style="font-size:10px;color:var(--text2);background:var(--surface2);padding:2px 7px;border-radius:4px">Live</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px" id="user-badge"></div>
+  </div>
+  <div class="content" id="main-content"></div>
+  <button class="fab no-print" id="fab-btn" onclick="openNewObs()">
+    <svg width="24" height="24" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <div class="bottom-nav no-print">
+    <button class="nav-btn active" id="nav-feed" onclick="setView('feed')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Feed
+    </button>
+    <button class="nav-btn" id="nav-dashboard" onclick="setView('dashboard')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard
+    </button>
+  </div>
+</div>
+
+<!-- NEW OBSERVATION MODAL -->
+<div class="modal-overlay no-print" id="obs-modal" style="display:none" onclick="closeModalBg(event)">
+<div class="modal">
+  <div class="modal-handle"></div>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+    <svg width="18" height="18" viewBox="0 0 30 30" fill="none"><path d="M6 4h14l-4 7 4 7H6V4z" fill="var(--brand)"/><rect x="4" y="4" width="3" height="22" rx="1.5" fill="var(--brand-dk)"/></svg>
+    <span style="font-size:16px;font-weight:600">Raise a flag</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+    <div><label class="field-label">Category</label>
+    <select id="f-cat"><option>PPE</option><option>Fire Safety</option><option>Housekeeping</option><option>Electrical</option><option>Working at Height</option><option>Chemical Handling</option><option>Machinery</option><option>Environmental</option><option>Other</option></select></div>
+    <div>
+      <label class="field-label">Location</label>
+      <select id="f-loc" onchange="toggleOtherLoc()"><option>Zone A - Laydown</option><option>Zone B - Fabrication</option><option>Zone C - Utilities</option><option>Zone D - Offices</option><option>Zone E - Warehouse</option><option>Main Gate</option><option>Scaffolding Area</option><option>Roof Level</option><option value="other">Other (specify)</option></select>
+      <input type="text" id="f-loc-other" placeholder="Describe location..." style="margin-top:6px;display:none"/>
+    </div>
+    <div><label class="field-label">Severity</label>
+    <select id="f-sev"><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option></select></div>
+    <div><label class="field-label">Assignee</label>
+    <select id="f-assign"><option>Ahmed Al-Farsi</option><option>Sarah Mitchell</option><option>Kumar Patel</option><option>Fatima Hassan</option><option>James O'Brien</option><option>Layla Nasser</option></select></div>
+  </div>
+  <label class="field-label">What did you observe?</label>
+  <textarea id="f-desc" rows="3" placeholder="Describe the hazard or non-conformance..." style="margin-bottom:12px;resize:none"></textarea>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+    <label class="field-label" style="margin:0">Recommended action</label>
+    <button class="ai-btn" id="ai-btn" onclick="getAIRec()">AI suggest</button>
+  </div>
+  <div id="ai-err" style="display:none;font-size:12px;color:var(--red);margin-bottom:6px"></div>
+  <textarea id="f-rec" rows="3" placeholder="Type a recommendation or tap AI suggest..." style="margin-bottom:12px;resize:none"></textarea>
+  <label class="field-label">Observation photos</label>
+  <div id="obs-photo-preview" class="photo-grid"></div>
+  <label style="display:flex;align-items:center;gap:8px;margin-top:8px;margin-bottom:14px;cursor:pointer;font-size:13px;color:var(--brand)">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+    Attach photos
+    <input type="file" id="f-photos" accept="image/*" multiple capture="environment" style="display:none" onchange="previewPhotos(this,'obs-photo-preview','obsPhotos')"/>
+  </label>
+  <div style="display:flex;gap:10px;align-items:flex-end;margin-bottom:14px;flex-wrap:wrap">
+    <div><label class="field-label">Close-out timeframe</label>
+    <select id="f-time" style="width:150px"><option>Immediate</option><option>Same Day</option><option>4 Hours</option><option>24 Hours</option><option>3 Days</option><option>1 Week</option></select></div>
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="f-ncr" style="width:15px;height:15px"/> Raise NCR</label>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-brand" style="flex:2" onclick="submitObs()">Flag it</button>
+  </div>
+</div>
+</div>
+
+<!-- PRINT TEMPLATE -->
+<div id="print-area" style="display:none;padding:24px;font-family:Arial,sans-serif;max-width:800px;margin:0 auto">
+</div>
+
+<script>
+const SEVCOLORS={Low:{bg:"#e6f3e8",text:"#1a6b2a",border:"#7bbf8a"},Medium:{bg:"#fff8e1",text:"#7a5500",border:"#f5c542"},High:{bg:"#fff0e6",text:"#8a3000",border:"#f5a142"},Critical:{bg:"#fdeaea",text:"#8a1a1a",border:"#e05252"}};
+const STATCOLORS={"Open":{bg:"#fdeaea",text:"#8a1a1a"},"In Progress":{bg:"#fff8e1",text:"#7a5500"},"Pending Verification":{bg:"#e6eeff",text:"#1a3a8a"},"Closed":{bg:"#e6f3e8",text:"#1a6b2a"}};
+const AVCOLORS=[["#f7e4d4","#993c1d"],["#faece7","#d85a30"],["#d4e4f7","#185fa5"],["#d4f0e4","#0f6e56"],["#e4d4f7","#533ab7"],["#f7d4e4","#993556"]];
+
+// Org-isolated seed data
+const SEED = {
+  AlphaConstruction:[
+    {id:1,ref:"FLG-001",org:"AlphaConstruction",date:"2025-04-15",time:"08:42",reporter:"Ahmed Al-Farsi",category:"PPE",location:"Zone B - Fabrication",severity:"High",description:"Worker observed operating angle grinder without face shield. Full-face protection mandatory per site safety plan.",recommendation:"Immediate stop-work. Provide face shield and conduct toolbox talk on PPE compliance.",timeframe:"Same Day",assignee:"Kumar Patel",status:"Closed",isNCR:false,photos:[],comments:[{user:"Kumar Patel",time:"09:15",text:"Stop-work issued. Worker briefed. Shield provided."}],closeout:{done:true,date:"2025-04-15",by:"Kumar Patel",action:"PPE toolbox talk conducted. Replacement face shield issued. Worker signed acknowledgement form.",photos:[]}},
+    {id:2,ref:"FLG-002",org:"AlphaConstruction",date:"2025-04-15",time:"10:15",reporter:"Sarah Mitchell",category:"Fire Safety",location:"Zone A - Laydown",severity:"Critical",description:"Combustible materials stored within 1m of welding operations. Immediate fire risk identified.",recommendation:"Relocate materials minimum 5m from hot work zone. Enforce hot work permit requirements.",timeframe:"Immediate",assignee:"James O'Brien",status:"In Progress",isNCR:true,ncrRef:"NCR-001",photos:[],comments:[{user:"James O'Brien",time:"11:00",text:"Materials relocated. Hot work permit review scheduled."}],closeout:{done:false,date:"",by:"",action:"",photos:[]}},
+    {id:3,ref:"FLG-003",org:"AlphaConstruction",date:"2025-04-16",time:"13:30",reporter:"Kumar Patel",category:"Working at Height",location:"Scaffolding Area",severity:"Critical",description:"Incomplete scaffold boarding on Level 3. Gap of approx 0.4m observed. No toe boards in place.",recommendation:"Complete scaffold boarding immediately. Install toe boards. Conduct scaffold inspection.",timeframe:"Immediate",assignee:"Ahmed Al-Farsi",status:"Open",isNCR:true,ncrRef:"NCR-002",photos:[],comments:[],closeout:{done:false,date:"",by:"",action:"",photos:[]}},
+  ],
+  BetaEngineering:[
+    {id:10,ref:"FLG-001",org:"BetaEngineering",date:"2025-04-14",time:"09:00",reporter:"Maria Lopez",category:"Electrical",location:"Control Room",severity:"High",description:"Exposed wiring found behind panel B-12. Insulation degraded.",recommendation:"Isolate panel. Replace wiring immediately. Log in maintenance register.",timeframe:"Same Day",assignee:"David Chen",status:"Open",isNCR:false,photos:[],comments:[],closeout:{done:false,date:"",by:"",action:"",photos:[]}},
+  ],
+  GammaOilGas:[
+    {id:20,ref:"FLG-001",org:"GammaOilGas",date:"2025-04-13",time:"07:00",reporter:"Hassan Al-Rashid",category:"Chemical Handling",location:"Tank Farm",severity:"Critical",description:"Leak detected at valve junction on Tank 3. Strong hydrocarbon odour.",recommendation:"Emergency shutdown procedure. Evacuate area. Notify HSEQ and maintenance.",timeframe:"Immediate",assignee:"Priya Nair",status:"In Progress",isNCR:true,ncrRef:"NCR-001",photos:[],comments:[],closeout:{done:false,date:"",by:"",action:"",photos:[]}},
+  ]
+};
+
+let currentUser=null,pendingUser=null,currentOTP='';
+
+function generateOTP(){
+  currentOTP=String(Math.floor(100000+Math.random()*900000));
+  const el=document.getElementById('otp-display');
+  if(el)el.textContent=currentOTP;
+  return currentOTP;
+}
+let observations=[];
+let nextId=100;
+let currentView="feed",filterSev="All",filterStat="All",selectedObs=null;
+let obsPhotos=[],closeoutPhotos=[];
+
+function showScreen(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const appShell=document.getElementById('app-shell');
+  if(appShell)appShell.classList.remove('active');
+  const targetScreen=document.getElementById('screen-'+n);
+  if(targetScreen){
+    targetScreen.classList.add('active');
+    return;
+  }
+  if(n==='app'&&appShell){
+    appShell.classList.add('active');
+    renderApp();
+  }
+}
+
+function doSignIn(){
+  const org=document.getElementById('si-org').value;
+  const email=document.getElementById('si-email').value.trim();
+  const pw=document.getElementById('si-pw').value;
+  const err=document.getElementById('signin-err');
+  err.style.display='none';
+  if(!org){err.textContent='Please select your organisation.';err.style.display='block';return;}
+  if(!email||!pw){err.textContent='Please fill in all fields.';err.style.display='block';return;}
+  if(!/\S+@\S+\.\S+/.test(email)){err.textContent='Enter a valid email address.';err.style.display='block';return;}
+  const btn=document.getElementById('signin-btn');btn.textContent='Signing in...';btn.disabled=true;
+  setTimeout(()=>{
+    btn.textContent='Sign in to FLAGIT';btn.disabled=false;
+    if(email==='demo@flagit.app'&&pw==='FlagIt#1!'){
+      currentUser={name:'Ahmed Al-Farsi',role:'HSE Manager',email,org};
+      observations=JSON.parse(JSON.stringify(SEED[org]||[]));
+      nextId=observations.length?Math.max(...observations.map(o=>o.id))+1:100;
+      showScreen('app');
+    } else {err.textContent='Incorrect credentials. Try demo@flagit.app / FlagIt#1!';err.style.display='block';}
+  },1200);
+}
+
+function doSignUp(){
+  const org=document.getElementById('su-org').value.trim();
+  const name=document.getElementById('su-name').value.trim();
+  const role=document.getElementById('su-role').value;
+  const email=document.getElementById('su-email').value.trim();
+  const pw=document.getElementById('su-pw').value;
+  const confirm=document.getElementById('su-confirm').value;
+  const err=document.getElementById('signup-err');
+  err.style.display='none';
+  if(!org||!name||!email||!pw||!confirm){err.textContent='All fields are required.';err.style.display='block';return;}
+  if(!/\S+@\S+\.\S+/.test(email)){err.textContent='Enter a valid email address.';err.style.display='block';return;}
+  if(pw.length<8){err.textContent='Password must be at least 8 characters.';err.style.display='block';return;}
+  if(pw!==confirm){err.textContent='Passwords do not match.';err.style.display='block';return;}
+  pendingUser={name,role,email,org};
+  showScreen('verify');
+  setTimeout(()=>{
+    const sub=document.getElementById('verify-sub');
+    if(sub)sub.textContent='A verification code has been generated for '+email;
+    generateOTP();
+    for(let i=0;i<6;i++){const el=document.getElementById('otp'+i);if(el)el.value='';}
+  },50);
+}
+
+function updatePwStrength(){
+  const pw=document.getElementById('su-pw').value;
+  const checks=[pw.length>=8,/[A-Z]/.test(pw),/[0-9]/.test(pw),/[^A-Za-z0-9]/.test(pw)];
+  const score=checks.filter(Boolean).length;
+  const cols=['','#e05252','#f5a142','#f5c542','#7bbf8a'];
+  const labels=['','Weak','Fair','Good','Strong'];
+  for(let i=1;i<=4;i++)document.getElementById('pb'+i).style.background=i<=score?cols[score]:'var(--border)';
+  document.getElementById('pw-label').textContent=pw.length>0?labels[score]:'';
+  document.getElementById('pw-label').style.color=cols[score]||'';
+}
+
+function otpInput(i,el){el.value=el.value.replace(/\D/g,'');if(el.value&&i<5)document.getElementById('otp'+(i+1)).focus();}
+function otpKey(i,e){if(e.key==='Backspace'&&!document.getElementById('otp'+i).value&&i>0)document.getElementById('otp'+(i-1)).focus();}
+
+function doVerify(){
+  let code='';for(let i=0;i<6;i++)code+=document.getElementById('otp'+i).value;
+  const err=document.getElementById('verify-err');err.style.display='none';
+  if(code.length<6){err.textContent='Enter the full 6-digit code.';err.style.display='block';return;}
+  if(code===currentOTP){
+    currentUser=pendingUser||{name:'New User',role:'Field Safety Officer',email:'user@flagit.app',org:'My Organisation'};
+    observations=JSON.parse(JSON.stringify(SEED[currentUser.org]||[]));
+    nextId=observations.length?Math.max(...observations.map(o=>o.id))+1:100;
+    showScreen('app');
+  } else {err.textContent='Incorrect code.';err.style.display='block';}
+}
+
+function resendCode(){
+  generateOTP();
+  for(let i=0;i<6;i++)document.getElementById('otp'+i).value='';
+  const ok=document.getElementById('verify-ok');ok.style.display='block';setTimeout(()=>ok.style.display='none',3000);
+}
+function doForgot(){
+  const e=document.getElementById('fp-email').value.trim();if(!e)return;
+  document.getElementById('fp-sent-email').textContent=e;
+  document.getElementById('forgot-form-card').style.display='none';
+  document.getElementById('forgot-sent-card').style.display='block';
+}
+
+function avatar(name,size=32){
+  const idx=name.charCodeAt(0)%AVCOLORS.length;
+  const[bg,col]=AVCOLORS[idx];
+  const init=name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  return `<div class="avatar" style="width:${size}px;height:${size}px;background:${bg};color:${col};font-size:${size*.35}px">${init}</div>`;
+}
+function badge(label,colors){return `<span class="badge" style="background:${colors.bg};color:${colors.text};border:0.5px solid ${colors.border||colors.bg}">${label}</span>`;}
+
+function toggleOtherLoc(){
+  const sel=document.getElementById('f-loc');
+  const oth=document.getElementById('f-loc-other');
+  oth.style.display=sel.value==='other'?'block':'none';
+}
+
+function previewPhotos(input,gridId,arrayName){
+  const grid=document.getElementById(gridId);
+  const files=Array.from(input.files);
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const src=e.target.result;
+      if(arrayName==='obsPhotos')obsPhotos.push(src);
+      else if(arrayName==='closeoutPhotos')closeoutPhotos.push(src);
+      renderPhotoGrid(grid,arrayName==='obsPhotos'?obsPhotos:closeoutPhotos,arrayName);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderPhotoGrid(grid,photos,arrName){
+  grid.innerHTML='';
+  photos.forEach((src,i)=>{
+    const img=document.createElement('img');
+    img.src=src;img.className='photo-thumb';img.title='Click to remove';
+    img.onclick=()=>{photos.splice(i,1);renderPhotoGrid(grid,photos,arrName);};
+    grid.appendChild(img);
+  });
+}
+
+function renderApp(){
+  const u=currentUser;
+  const orgLabel=u.org.replace(/([A-Z])/g,' $1').trim();
+  document.getElementById('user-badge').innerHTML=`<span class="org-pill">${orgLabel}</span>${avatar(u.name,28)}<div style="line-height:1.2"><div style="font-size:12px;font-weight:500">${u.name}</div><div style="font-size:11px;color:var(--text2)">${u.role}</div></div><button onclick="doSignOut()" style="font-size:12px;padding:4px 8px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer">Out</button>`;
+  setView('feed');
+}
+
+function setView(v){
+  currentView=v;
+  ['feed','dashboard'].forEach(k=>document.getElementById('nav-'+k).classList.toggle('active',k===v));
+  document.getElementById('fab-btn').style.display=v==='feed'?'flex':'none';
+  selectedObs=null;renderContent();
+}
+
+function renderContent(){
+  const c=document.getElementById('main-content');
+  if(selectedObs){renderDetail(c);return;}
+  currentView==='feed'?renderFeed(c):renderDashboard(c);
+}
+
+function renderFeed(c){
+  const filtered=observations.filter(o=>(filterSev==='All'||o.severity===filterSev)&&(filterStat==='All'||o.status===filterStat));
+  const open=observations.filter(o=>o.status==='Open').length;
+  const inprog=observations.filter(o=>o.status==='In Progress').length;
+  const crit=observations.filter(o=>o.severity==='Critical').length;
+  let html=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
+    <div class="metric" style="background:#fdeaea"><div class="lbl" style="color:#8a1a1a">Open</div><div class="val" style="color:#8a1a1a">${open}</div></div>
+    <div class="metric" style="background:#fff8e1"><div class="lbl" style="color:#7a5500">Active</div><div class="val" style="color:#7a5500">${inprog}</div></div>
+    <div class="metric" style="background:#fff0e6"><div class="lbl" style="color:#8a3000">Critical</div><div class="val" style="color:#8a3000">${crit}</div></div>
+  </div>
+  <div class="filter-bar">${['All','Low','Medium','High','Critical'].map(s=>`<button class="filter-btn ${filterSev===s?'active':''}" onclick="setSevFilter('${s}')">${s}</button>`).join('')}</div>
+  <div class="filter-bar">${['All','Open','In Progress','Pending Verification','Closed'].map(s=>`<button class="filter-btn ${filterStat===s?'active':''}" onclick="setStatFilter('${s}')">${s}</button>`).join('')}</div>`;
+  if(!filtered.length)html+='<div style="text-align:center;color:var(--text2);padding:2rem;font-size:14px">No flags match your filters.</div>';
+  filtered.forEach(o=>{
+    const co=o.closeout&&o.closeout.done;
+    html+=`<div class="obs-card" style="border-left-color:${SEVCOLORS[o.severity].border}" onclick="openObs(${o.id})">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:4px">
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <span style="font-size:12px;font-weight:500;color:var(--text2)">${o.ref}</span>
+          ${badge(o.severity,SEVCOLORS[o.severity])}${badge(o.status,STATCOLORS[o.status])}
+          ${o.isNCR?badge('NCR',{bg:'#f0e6ff',text:'#4a1a8a'}):''}
+          ${co?badge('Closed out',{bg:'#e6f3e8',text:'#1a6b2a'}):''}
+        </div>
+        <span style="font-size:11px;color:var(--text2)">${o.time}</span>
+      </div>
+      <div style="font-size:14px;font-weight:500;margin-bottom:4px">${o.category} — ${o.location}</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${o.description}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:6px">${avatar(o.reporter,22)}<span style="font-size:12px;color:var(--text2)">${o.reporter}</span></div>
+        <div style="display:flex;gap:8px">
+          ${o.photos&&o.photos.length?`<span style="font-size:12px;color:var(--text2)">${o.photos.length} photo${o.photos.length>1?'s':''}</span>`:''}
+          ${o.comments.length?`<span style="font-size:12px;color:var(--text2)">${o.comments.length} cmts</span>`:''}
+        </div>
+      </div>
+    </div>`;
+  });
+  c.innerHTML=html;
+}
+
+function renderDetail(c){
+  const o=selectedObs;
+  closeoutPhotos=o.closeout.photos?[...o.closeout.photos]:[];
+  document.getElementById('fab-btn').style.display='none';
+  const photoHtml=photos=>{
+    if(!photos||!photos.length)return '<div style="font-size:13px;color:var(--text2)">No photos attached.</div>';
+    return `<div class="photo-grid">${photos.map(src=>`<img src="${src}" class="photo-thumb" style="cursor:default"/>`).join('')}</div>`;
+  };
+  c.innerHTML=`
+    <button class="back-btn" onclick="closeDetail()">← Back to feed</button>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <button class="tab active" id="tab-obs" onclick="switchTab('obs')">Observation</button>
+      <button class="tab" id="tab-closeout" onclick="switchTab('closeout')">Close-out ${o.closeout.done?'✓':''}</button>
+      <div style="flex:1"></div>
+      <button onclick="printObs(${o.id})" style="font-size:12px;padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;gap:5px;color:var(--text2)">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print / Share
+      </button>
+    </div>
+
+    <div id="tab-obs-content">
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:4px">${o.ref} · ${o.date} ${o.time}</div>
+            <div style="font-size:17px;font-weight:600">${o.category} — ${o.location}</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">${badge(o.severity,SEVCOLORS[o.severity])}${badge(o.status,STATCOLORS[o.status])}${o.isNCR?badge('NCR '+o.ncrRef,{bg:'#f0e6ff',text:'#4a1a8a'}):''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">${avatar(o.reporter,26)}<span style="font-size:13px;color:var(--text2)">Flagged by <b>${o.reporter}</b></span></div>
+        <div class="tag-box"><div class="section-label">Observation</div><div style="font-size:14px;line-height:1.6">${o.description}</div></div>
+        <div class="tag-box"><div class="section-label">Recommendation</div><div style="font-size:14px;line-height:1.6">${o.recommendation}</div></div>
+        <div style="display:flex;gap:24px;margin-bottom:14px">
+          <div><div style="font-size:11px;color:var(--text2)">Assignee</div><div style="font-size:13px;font-weight:500">${o.assignee}</div></div>
+          <div><div style="font-size:11px;color:var(--text2)">Timeframe</div><div style="font-size:13px;font-weight:500">${o.timeframe}</div></div>
+        </div>
+        <div class="section-label">Observation photos</div>
+        ${photoHtml(o.photos)}
+        <hr class="divider"/>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Update status</div>
+        <div style="display:flex;flex-wrap:wrap">${['Open','In Progress','Pending Verification','Closed'].map(s=>`<button class="status-btn ${o.status===s?'active':''}" onclick="updateStatus(${o.id},'${s}')">${s}</button>`).join('')}</div>
+      </div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:500;margin-bottom:12px">Follow-up comments (${o.comments.length})</div>
+        ${!o.comments.length?'<div style="font-size:13px;color:var(--text2);margin-bottom:12px">No comments yet.</div>':''}
+        ${o.comments.map(cm=>`<div style="display:flex;gap:8px;margin-bottom:12px">${avatar(cm.user,26)}<div class="comment-bubble"><div style="font-size:12px;color:var(--text2);margin-bottom:3px"><b>${cm.user}</b> · ${cm.time}</div><div style="font-size:13px">${cm.text}</div></div></div>`).join('')}
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <input type="text" id="comment-input" placeholder="Add a follow-up comment..." style="flex:1" onkeydown="if(event.key==='Enter')addComment(${o.id})"/>
+          <button class="btn btn-brand" style="padding:10px 14px;flex-shrink:0" onclick="addComment(${o.id})">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-closeout-content" style="display:none">
+      <div class="${o.closeout.done?'closeout-box':'closeout-box pending'}" style="margin-bottom:12px">
+        ${o.closeout.done
+          ?`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><div style="width:28px;height:28px;border-radius:50%;background:#bbf7d0;display:flex;align-items:center;justify-content:center;font-size:14px;color:#1a6b2a">✓</div><div><div style="font-size:13px;font-weight:500;color:#1a6b2a">Closed out</div><div style="font-size:11px;color:var(--text2)">by ${o.closeout.by} on ${o.closeout.date}</div></div></div>
+           <div class="tag-box" style="background:#fff"><div class="section-label">Action taken</div><div style="font-size:14px;line-height:1.6">${o.closeout.action}</div></div>
+           <div class="section-label" style="margin-top:10px">Close-out photos</div>
+           ${photoHtml(o.closeout.photos)}`
+          :`<div style="font-size:13px;font-weight:500;color:#7a5500;margin-bottom:4px">Pending close-out</div>
+            <div style="font-size:12px;color:var(--text2)">Complete the form below to record corrective action taken.</div>`
+        }
+      </div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:500;margin-bottom:14px">Record corrective action</div>
+        <label class="field-label">Description of action taken</label>
+        <textarea id="co-action" rows="4" placeholder="Describe the corrective action(s) taken in detail..." style="margin-bottom:12px;resize:none">${o.closeout.action||''}</textarea>
+        <label class="field-label">Close-out photos</label>
+        <div id="co-photo-preview" class="photo-grid" style="margin-bottom:8px"></div>
+        <label style="display:flex;align-items:center;gap:8px;margin-bottom:16px;cursor:pointer;font-size:13px;color:var(--brand)">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Attach close-out photos
+          <input type="file" id="co-photos" accept="image/*" multiple capture="environment" style="display:none" onchange="previewPhotos(this,'co-photo-preview','closeoutPhotos')"/>
+        </label>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" style="flex:1" onclick="saveCloseout(${o.id},false)">Save draft</button>
+          <button class="btn btn-green" style="flex:2" onclick="saveCloseout(${o.id},true)">Mark as closed out</button>
+        </div>
+      </div>
+    </div>`;
+
+  // render existing closeout photos
+  setTimeout(()=>{
+    const g=document.getElementById('co-photo-preview');
+    if(g)renderPhotoGrid(g,closeoutPhotos,'closeoutPhotos');
+  },50);
+}
+
+function switchTab(t){
+  document.getElementById('tab-obs-content').style.display=t==='obs'?'block':'none';
+  document.getElementById('tab-closeout-content').style.display=t==='closeout'?'block':'none';
+  document.getElementById('tab-obs').classList.toggle('active',t==='obs');
+  document.getElementById('tab-closeout').classList.toggle('active',t==='closeout');
+}
+
+function saveCloseout(id,markDone){
+  const action=document.getElementById('co-action').value.trim();
+  const now=new Date();
+  observations=observations.map(o=>{
+    if(o.id!==id)return o;
+    const co={done:markDone,date:now.toISOString().slice(0,10),by:currentUser.name,action,photos:[...closeoutPhotos]};
+    const status=markDone?'Closed':o.status;
+    return{...o,closeout:co,status};
+  });
+  selectedObs=observations.find(o=>o.id===id);
+  renderContent();
+  switchTab('closeout');
+}
+
+function renderDashboard(c){
+  const total=observations.length,open=observations.filter(o=>o.status==='Open').length,
+    inprog=observations.filter(o=>o.status==='In Progress').length,
+    pend=observations.filter(o=>o.status==='Pending Verification').length,
+    closed=observations.filter(o=>o.status==='Closed').length,
+    ncrs=observations.filter(o=>o.isNCR),
+    coCount=observations.filter(o=>o.closeout&&o.closeout.done).length;
+  const sevs=['Low','Medium','High','Critical'];
+  const cats=['PPE','Fire Safety','Housekeeping','Electrical','Working at Height','Chemical Handling','Machinery','Environmental','Other'].filter(cat=>observations.some(o=>o.category===cat));
+  const orgLabel=(currentUser.org||'').replace(/([A-Z])/g,' $1').trim();
+  c.innerHTML=`
+    <div style="font-size:15px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px">
+      <span class="org-pill">${orgLabel}</span> Dashboard
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
+      ${[['Total',total,''],['Open',open,'#fdeaea'],['Active',inprog,'#fff8e1'],['Pending',pend,''],['Closed',closed,'#e6f3e8'],['NCRs',ncrs.length,'#f0e6ff'],['Closed out',coCount,'#d1fae5']].map(([l,v,bg])=>`<div class="metric" ${bg?`style="background:${bg}"`:''}><div class="lbl">${l}</div><div class="val">${v}</div></div>`).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div class="card"><div style="font-size:13px;font-weight:500;margin-bottom:10px">By severity</div>
+        ${sevs.map(s=>{const n=observations.filter(o=>o.severity===s).length;return `<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="color:var(--text2)">${s}</span><b>${n}</b></div><div style="height:5px;border-radius:3px;background:var(--surface2)"><div style="height:100%;border-radius:3px;width:${total?Math.round(n/total*100):0}%;background:${SEVCOLORS[s].border}"></div></div></div>`;}).join('')}
+      </div>
+      <div class="card"><div style="font-size:13px;font-weight:500;margin-bottom:10px">By category</div>
+        ${cats.map(cat=>{const n=observations.filter(o=>o.category===cat).length;return `<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="color:var(--text2)">${cat.split(' ')[0]}</span><b>${n}</b></div><div style="height:5px;border-radius:3px;background:var(--surface2)"><div style="height:100%;border-radius:3px;width:${total?Math.round(n/total*100):0}%;background:var(--brand)"></div></div></div>`;}).join('')}
+      </div>
+    </div>
+    <div class="card"><div style="font-size:13px;font-weight:500;margin-bottom:10px">NCR register</div>
+      ${!ncrs.length?'<div style="font-size:13px;color:var(--text2)">No NCRs raised.</div>':''}
+      ${ncrs.map(o=>`<div onclick="openObs(${o.id})" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer"><div><span style="font-size:12px;font-weight:500;color:#4a1a8a;margin-right:8px">${o.ncrRef}</span><span style="font-size:13px">${o.category}</span></div><div style="display:flex;gap:6px">${badge(o.severity,SEVCOLORS[o.severity])}${badge(o.status,STATCOLORS[o.status])}</div></div>`).join('')}
+    </div>`;
+}
+
+function openObs(id){selectedObs=observations.find(o=>o.id===id);closeoutPhotos=selectedObs.closeout.photos?[...selectedObs.closeout.photos]:[];document.getElementById('fab-btn').style.display='none';renderContent();}
+function closeDetail(){selectedObs=null;document.getElementById('fab-btn').style.display='flex';renderContent();}
+function setSevFilter(v){filterSev=v;renderContent();}
+function setStatFilter(v){filterStat=v;renderContent();}
+
+function updateStatus(id,status){
+  observations=observations.map(o=>o.id===id?{...o,status}:o);
+  selectedObs=observations.find(o=>o.id===id);renderContent();
+}
+
+function addComment(id){
+  const inp=document.getElementById('comment-input');
+  if(!inp||!inp.value.trim())return;
+  const now=new Date();
+  observations=observations.map(o=>o.id===id?{...o,comments:[...o.comments,{user:currentUser.name,time:now.toTimeString().slice(0,5),text:inp.value.trim()}]}:o);
+  selectedObs=observations.find(o=>o.id===id);renderContent();
+}
+
+function openNewObs(){
+  obsPhotos=[];
+  document.getElementById('obs-modal').style.display='flex';
+  document.getElementById('f-desc').value='';
+  document.getElementById('f-rec').value='';
+  document.getElementById('f-ncr').checked=false;
+  document.getElementById('ai-err').style.display='none';
+  document.getElementById('obs-photo-preview').innerHTML='';
+  document.getElementById('f-loc').value='Zone A - Laydown';
+  document.getElementById('f-loc-other').style.display='none';
+}
+function closeModal(){document.getElementById('obs-modal').style.display='none';}
+function closeModalBg(e){if(e.target===document.getElementById('obs-modal'))closeModal();}
+
+async function getAIRec(){
+  const desc=document.getElementById('f-desc').value.trim();if(!desc)return;
+  const btn=document.getElementById('ai-btn'),errEl=document.getElementById('ai-err');
+  btn.disabled=true;btn.textContent='Thinking...';errEl.style.display='none';
+  document.getElementById('f-rec').value='';
+  try{
+    const cat=document.getElementById('f-cat').value;
+    const locSel=document.getElementById('f-loc').value;
+    const loc=locSel==='other'?document.getElementById('f-loc-other').value:locSel;
+    const sev=document.getElementById('f-sev').value;
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`You are an expert HSE advisor. A field officer raised the following observation via FLAGIT. Give a concise corrective action recommendation.\n\nCategory: ${cat}\nLocation: ${loc}\nSeverity: ${sev}\nObservation: ${desc}\n\nRespond with ONLY practical numbered steps. Under 80 words.`}]})});
+    const data=await res.json();
+    const text=data.content?.find(b=>b.type==='text')?.text||'';
+    if(!text)throw new Error();
+    document.getElementById('f-rec').value=text;
+  }catch(e){errEl.textContent='Could not get AI suggestion. Please type manually.';errEl.style.display='block';}
+  btn.disabled=false;btn.textContent='AI suggest';
+}
+
+function submitObs(){
+  const desc=document.getElementById('f-desc').value.trim();if(!desc)return;
+  const now=new Date();
+  const isNCR=document.getElementById('f-ncr').checked;
+  const locSel=document.getElementById('f-loc').value;
+  const loc=locSel==='other'?document.getElementById('f-loc-other').value||'Other':locSel;
+  const newObs={
+    id:nextId,ref:`FLG-${String(nextId).padStart(3,'0')}`,org:currentUser.org,
+    date:now.toISOString().slice(0,10),time:now.toTimeString().slice(0,5),
+    reporter:currentUser.name,
+    category:document.getElementById('f-cat').value,
+    location:loc,severity:document.getElementById('f-sev').value,
+    description:desc,recommendation:document.getElementById('f-rec').value,
+    timeframe:document.getElementById('f-time').value,
+    assignee:document.getElementById('f-assign').value,
+    isNCR,ncrRef:isNCR?`NCR-${String(nextId).padStart(3,'0')}`:null,
+    status:'Open',photos:[...obsPhotos],comments:[],
+    closeout:{done:false,date:'',by:'',action:'',photos:[]}
+  };
+  nextId++;observations=[newObs,...observations];
+  closeModal();renderContent();
+}
+
+function printObs(id){
+  const o=observations.find(x=>x.id===id);if(!o)return;
+  const orgLabel=(o.org||'').replace(/([A-Z])/g,' $1').trim();
+  const photoImgs=arr=>(arr&&arr.length)?arr.map(src=>`<img src="${src}" style="width:31%;margin:1%;border-radius:6px;border:1px solid #ddd"/>`).join(''):'<i style="color:#888">No photos attached.</i>';
+  const printHTML=`
+    <div style="padding:24px;font-family:Arial,sans-serif;max-width:800px;margin:0 auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #d85a30;padding-bottom:14px;margin-bottom:18px">
+        <div>
+          <div style="font-size:22px;font-weight:700;color:#d85a30;letter-spacing:-0.5px">FLAG<span style="color:#1a1a2e">IT</span></div>
+          <div style="font-size:11px;color:#888;letter-spacing:.06em;text-transform:uppercase">HSE Observation Report</div>
+        </div>
+        <div style="text-align:right;font-size:12px;color:#666">
+          <div><b>${o.ref}</b> · ${orgLabel}</div>
+          <div>Raised: ${o.date} ${o.time}</div>
+          <div>Printed: ${new Date().toLocaleDateString()}</div>
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13px">
+        <tr style="background:#faece7"><td style="padding:8px;font-weight:600;width:30%;border:1px solid #f0c0a0">Category</td><td style="padding:8px;border:1px solid #f0c0a0">${o.category}</td><td style="padding:8px;font-weight:600;width:30%;border:1px solid #f0c0a0">Severity</td><td style="padding:8px;border:1px solid #f0c0a0">${o.severity}</td></tr>
+        <tr><td style="padding:8px;font-weight:600;border:1px solid #ddd">Location</td><td style="padding:8px;border:1px solid #ddd" colspan="3">${o.location}</td></tr>
+        <tr style="background:#faece7"><td style="padding:8px;font-weight:600;border:1px solid #f0c0a0">Reported by</td><td style="padding:8px;border:1px solid #f0c0a0">${o.reporter}</td><td style="padding:8px;font-weight:600;border:1px solid #f0c0a0">Assignee</td><td style="padding:8px;border:1px solid #f0c0a0">${o.assignee}</td></tr>
+        <tr><td style="padding:8px;font-weight:600;border:1px solid #ddd">Timeframe</td><td style="padding:8px;border:1px solid #ddd">${o.timeframe}</td><td style="padding:8px;font-weight:600;border:1px solid #ddd">Status</td><td style="padding:8px;border:1px solid #ddd">${o.status}</td></tr>
+        ${o.isNCR?`<tr style="background:#f0e6ff"><td style="padding:8px;font-weight:600;border:1px solid #c0a0e0">NCR Reference</td><td style="padding:8px;border:1px solid #c0a0e0" colspan="3">${o.ncrRef}</td></tr>`:''}
+      </table>
+      <div style="margin-bottom:14px"><div style="font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:#888;margin-bottom:6px">Observation</div><div style="border:1px solid #ddd;border-radius:6px;padding:10px;font-size:14px;line-height:1.6;min-height:60px">${o.description}</div></div>
+      <div style="margin-bottom:14px"><div style="font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:#888;margin-bottom:6px">Recommended Action</div><div style="border:1px solid #ddd;border-radius:6px;padding:10px;font-size:14px;line-height:1.6;min-height:60px">${o.recommendation}</div></div>
+      ${o.photos&&o.photos.length?`<div style="margin-bottom:14px"><div style="font-weight:600;font-size:12px;text-transform:uppercase;color:#888;margin-bottom:8px">Observation Photos</div><div style="display:flex;flex-wrap:wrap">${photoImgs(o.photos)}</div></div>`:''}
+      <div style="border:2px solid ${o.closeout.done?'#86efac':'#fcd34d'};border-radius:8px;padding:14px;margin-bottom:16px">
+        <div style="font-weight:600;font-size:13px;margin-bottom:10px;color:${o.closeout.done?'#1a6b2a':'#7a5500'}">${o.closeout.done?'Close-out record':'Close-out (pending)'}</div>
+        ${o.closeout.done
+          ?`<div style="font-size:12px;color:#666;margin-bottom:8px">Closed by ${o.closeout.by} on ${o.closeout.date}</div>
+            <div style="font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:#888;margin-bottom:6px">Action Taken</div>
+            <div style="border:1px solid #ddd;border-radius:6px;padding:10px;font-size:14px;line-height:1.6;min-height:50px">${o.closeout.action}</div>
+            ${o.closeout.photos&&o.closeout.photos.length?`<div style="margin-top:10px"><div style="font-weight:600;font-size:12px;text-transform:uppercase;color:#888;margin-bottom:8px">Close-out Photos</div><div style="display:flex;flex-wrap:wrap">${photoImgs(o.closeout.photos)}</div></div>`:''}`
+          :`<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px">
+              <div><div style="font-size:12px;color:#888;margin-bottom:4px">Action taken</div><div style="border:1px solid #ddd;border-radius:6px;padding:8px;min-height:60px;font-size:14px;background:#fffde7"></div></div>
+              <div><div style="font-size:12px;color:#888;margin-bottom:4px">Closed by / Date</div><div style="border:1px solid #ddd;border-radius:6px;padding:8px;min-height:60px;background:#fffde7"></div></div>
+            </div>`
+        }
+      </div>
+      <div style="margin-bottom:16px"><div style="font-weight:600;font-size:12px;text-transform:uppercase;color:#888;margin-bottom:8px">Comments / Follow-up log</div>
+        ${o.comments.length?o.comments.map(cm=>`<div style="border:1px solid #ddd;border-radius:6px;padding:8px 10px;margin-bottom:6px;font-size:13px"><b>${cm.user}</b> <span style="color:#888">${cm.time}</span><br>${cm.text}</div>`).join(''):'<div style="border:1px solid #ddd;border-radius:6px;padding:8px;font-size:13px;color:#888;min-height:40px">No comments recorded.</div>'}
+      </div>
+      <div style="border-top:1px solid #ddd;padding-top:12px;font-size:11px;color:#aaa;text-align:center">Generated by FLAGIT HSE Observation Platform · ${new Date().toLocaleString()} · ${orgLabel}</div>
+    </div>`;
+  const w=window.open('','_blank','width=900,height=700');
+  w.document.write(`<!DOCTYPE html><html><head><title>FLAGIT Report - ${o.ref}</title><style>body{margin:0}@media print{button{display:none}}</style></head><body>
+    <div style="text-align:center;padding:10px;background:#f5f5f5;border-bottom:1px solid #ddd;font-family:Arial">
+      <button onclick="window.print()" style="padding:8px 20px;background:#d85a30;color:#fff;border:none;border-radius:6px;font-size:14px;cursor:pointer;margin-right:8px">Print</button>
+      <button onclick="window.close()" style="padding:8px 16px;background:#eee;border:1px solid #ccc;border-radius:6px;font-size:14px;cursor:pointer">Close</button>
+      <span style="font-size:12px;color:#888;margin-left:12px">Share the URL of this window with sub-contractors (no login required to view)</span>
+    </div>
+    ${printHTML}</body></html>`);
+  w.document.close();
+}
+
+function doSignOut(){currentUser=null;observations=[];showScreen('signin');}
+
+if('serviceWorker'in navigator){const sw=`const C='flagit-v2';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['/']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
+const mf={name:'FLAGIT',short_name:'FLAGIT',start_url:'.',display:'standalone',background_color:'#f5f6fa',theme_color:'#d85a30',description:'HSE Observation & Compliance Platform',icons:[{src:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23d85a30'/><path d='M25 20h40l-12 20 12 20H25V20z' fill='white'/><rect x='20' y='20' width='8' height='60' rx='4' fill='white' opacity='.75'/></svg>`,sizes:'any',type:'image/svg+xml'}]};
+document.getElementById('manifest-placeholder').href=URL.createObjectURL(new Blob([JSON.stringify(mf)],{type:'application/manifest+json'}));
+document.getElementById('si-pw').addEventListener('keydown',e=>{if(e.key==='Enter')doSignIn();});
+</script>
+</body>
+</html>

@@ -3,18 +3,20 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-<meta name="theme-color" content="#d85a30"/>
+<meta name="theme-color" content="#0D0D0D"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="FLAGIT"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <title>FLAGIT — HSE Observation Platform</title>
 <link rel="manifest" id="manifest-placeholder"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f6fa;color:#1a1a2e;min-height:100vh}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0D0D0D;color:#F0F0F0;min-height:100vh}
 input,select,textarea,button{font-family:inherit}
-:root{--brand:#d85a30;--brand-dk:#993c1d;--brand-lt:#faece7;--blue:#185fa5;--blue-lt:#e6f1fb;--green:#1a6b2a;--green-lt:#e6f3e8;--red:#8a1a1a;--red-lt:#fdeaea;--amber:#7a5500;--amber-lt:#fff8e1;--orange:#8a3000;--orange-lt:#fff0e6;--purple:#4a1a8a;--purple-lt:#f0e6ff;--border:#e2e4ea;--surface:#fff;--surface2:#f5f6fa;--text:#1a1a2e;--text2:#6b7280;--radius:10px}
+:root{--brand:#D85A30;--brand-dk:#B84A24;--brand-lt:rgba(216,90,48,0.15);--blue:#3B82F6;--blue-lt:rgba(59,130,246,0.15);--green:#22C55E;--green-lt:rgba(34,197,94,0.15);--red:#EF4444;--red-lt:rgba(239,68,68,0.15);--amber:#F59E0B;--amber-lt:rgba(245,158,11,0.15);--orange:#D85A30;--orange-lt:rgba(216,90,48,0.15);--purple:#A855F7;--purple-lt:rgba(168,85,247,0.15);--border:#2A2A2A;--surface:#1A1A1A;--surface2:#222222;--text:#F0F0F0;--text2:#888888;--radius:10px;color-scheme:dark}
 .card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:16px}
 .btn{padding:11px 18px;border-radius:8px;border:none;font-size:14px;font-weight:500;cursor:pointer}
 .btn-brand{background:var(--brand);color:#fff}.btn-brand:disabled{opacity:.6}
@@ -47,7 +49,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--brand)}
 .status-btn.active{border-color:var(--brand);background:var(--brand-lt);color:var(--brand)}
 .comment-bubble{background:var(--surface2);border-radius:8px;padding:8px 12px;flex:1}
 .fab{position:fixed;bottom:70px;right:16px;width:54px;height:54px;border-radius:50%;background:var(--brand);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(216,90,48,.45);z-index:200}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:flex-end;overflow-y:auto}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:flex;align-items:flex-end;overflow-y:auto}
 .modal{background:var(--surface);border-radius:16px 16px 0 0;padding:20px 16px 32px;width:100%;max-height:94vh;overflow-y:auto}
 .modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 16px}
 .error-box{font-size:13px;color:var(--red);background:var(--red-lt);border-radius:7px;padding:8px 12px;margin-bottom:12px}
@@ -630,7 +632,7 @@ function renderDetail(c){
       <div class="${o.closeout.done?'closeout-box':'closeout-box pending'}" style="margin-bottom:12px">
         ${o.closeout.done
           ?`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><div style="width:28px;height:28px;border-radius:50%;background:#bbf7d0;display:flex;align-items:center;justify-content:center;font-size:14px;color:#1a6b2a">✓</div><div><div style="font-size:13px;font-weight:500;color:#1a6b2a">Closed out</div><div style="font-size:11px;color:var(--text2)">by ${o.closeout.by} on ${o.closeout.date}</div></div></div>
-           <div class="tag-box" style="background:#fff"><div class="section-label">Action taken</div><div style="font-size:14px;line-height:1.6">${o.closeout.action}</div></div>
+           <div class="tag-box" style="background:var(--surface2)"><div class="section-label">Action taken</div><div style="font-size:14px;line-height:1.6">${o.closeout.action}</div></div>
            <div class="section-label" style="margin-top:10px">Close-out photos</div>
            ${photoHtml(o.closeout.photos)}`
           :`<div style="font-size:13px;font-weight:500;color:#7a5500;margin-bottom:4px">Pending close-out</div>
@@ -806,7 +808,7 @@ function printObs(id){
     <div style="padding:24px;font-family:Arial,sans-serif;max-width:800px;margin:0 auto">
       <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #d85a30;padding-bottom:14px;margin-bottom:18px">
         <div>
-          <div style="font-size:22px;font-weight:700;color:#d85a30;letter-spacing:-0.5px">FLAG<span style="color:#1a1a2e">IT</span></div>
+          <div style="font-size:22px;font-weight:700;color:#D85A30;letter-spacing:-0.5px">FLAG<span style="color:#F0F0F0">IT</span></div>
           <div style="font-size:11px;color:#888;letter-spacing:.06em;text-transform:uppercase">HSE Observation Report</div>
         </div>
         <div style="text-align:right;font-size:12px;color:#666">
@@ -857,7 +859,7 @@ function printObs(id){
 function doSignOut(){saveCurrentOrgState();currentUser=null;observations=[];populateOrgSelect();showScreen('signin');}
 
 if('serviceWorker'in navigator){const sw=`const C='flagit-v2';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['/']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
-const mf={name:'FLAGIT',short_name:'FLAGIT',start_url:'.',display:'standalone',background_color:'#f5f6fa',theme_color:'#d85a30',description:'HSE Observation & Compliance Platform',icons:[{src:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23d85a30'/><path d='M25 20h40l-12 20 12 20H25V20z' fill='white'/><rect x='20' y='20' width='8' height='60' rx='4' fill='white' opacity='.75'/></svg>`,sizes:'any',type:'image/svg+xml'}]};
+const mf={name:'FLAGIT',short_name:'FLAGIT',start_url:'.',display:'standalone',background_color:'#0D0D0D',theme_color:'#d85a30',description:'HSE Observation & Compliance Platform',icons:[{src:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23d85a30'/><path d='M25 20h40l-12 20 12 20H25V20z' fill='white'/><rect x='20' y='20' width='8' height='60' rx='4' fill='white' opacity='.75'/></svg>`,sizes:'any',type:'image/svg+xml'}]};
 document.getElementById('manifest-placeholder').href=URL.createObjectURL(new Blob([JSON.stringify(mf)],{type:'application/manifest+json'}));
 bootStorage();
 populateOrgSelect();
